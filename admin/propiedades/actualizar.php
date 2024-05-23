@@ -1,5 +1,12 @@
 <?php
-    
+    require '../../includes/funciones.php';
+
+    $auth = estadoAutenticado();
+
+    if(!$auth){
+        header('location: /');
+    }
+
     $id = $_GET['id'];
     $id = filter_var($id, FILTER_VALIDATE_INT);
     
@@ -90,9 +97,17 @@
                 mkdir($carpetaImagenes);
             }
 
-            $nombreImagen = md5( uniqid( rand(), true)) . '.jpg';
+            $nombreImagen = '';
 
-            move_uploaded_file($imagen['tmp_name'] , $carpetaImagenes . "$nombreImagen");
+            if($imagen['name']){
+                unlink($carpetaImagenes . $propiedad['imagen']);
+
+                $nombreImagen = md5( uniqid( rand(), true)) . '.jpg';
+
+                move_uploaded_file($imagen['tmp_name'] , $carpetaImagenes . "$nombreImagen");
+            }else {
+                $nombreImagen = $propiedad['imagen'];
+            }
 
 
             $query = " UPDATE propiedades SET titulo = '{$titulo}', precio = '{$precio}', imagen = '{$nombreImagen}', descripcion = '{$descripcion}', habitaciones = {$habitaciones}, wc = {$wc}, estacionamiento = {$estacionamientos}, vendedores_id = {$vendedorId} WHERE id = {$id}; ";
@@ -107,7 +122,6 @@
         }
     }
 
-    require '../../includes/funciones.php';
     incluirTemplates('header');
 ?>
 
